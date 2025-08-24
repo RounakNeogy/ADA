@@ -166,3 +166,105 @@ OPTIMAL-MERGE-BST(T):
 * BST-based recursion is conceptually clean but less efficient in practice.
 
 ---
+
+### Huffman encoding
+
+---
+
+# 1. Recursive Definition of Huffman Encoding
+
+* **Base case**: If only one node remains in the forest, return it as the root of the Huffman tree.
+* **Recursive case**:
+
+  1. Pick two nodes with the smallest frequencies.
+  2. Merge them into a new node (parent) with frequency = sum.
+  3. Recurse on the reduced set of nodes.
+
+---
+
+# 2. Recursive Pseudocode — Heap Version (Greedy)
+
+We’ll use a **min-heap** storing nodes keyed by frequency.
+
+```text
+HUFFMAN(H):
+    // Input: min-heap H of nodes with (char, freq)
+    // Output: root of Huffman tree
+
+    if SIZE(H) == 1:
+        return HEAP-EXTRACT-MIN(H)   // only one node remains
+
+    x ← HEAP-EXTRACT-MIN(H)          // smallest frequency
+    y ← HEAP-EXTRACT-MIN(H)          // second smallest
+
+    z ← NEW-NODE()
+    z.freq ← x.freq + y.freq
+    z.left ← x
+    z.right ← y
+
+    HEAP-INSERT(H, z)
+
+    return HUFFMAN(H)
+```
+
+---
+
+# 3. Recursive Pseudocode — Balanced BST Version
+
+If we replace the heap with a balanced BST:
+
+```text
+HUFFMAN-BST(T):
+    // Input: balanced BST T of nodes (char, freq)
+    // Output: root of Huffman tree
+
+    if SIZE(T) == 1:
+        return TREE-MIN(T)   // only node is root
+
+    x ← TREE-MIN(T)
+    y ← TREE-SUCCESSOR(x)
+
+    TREE-DELETE(T, x)
+    TREE-DELETE(T, y)
+
+    z ← NEW-NODE()
+    z.freq ← x.freq + y.freq
+    z.left ← x
+    z.right ← y
+
+    TREE-INSERT(T, z)
+
+    return HUFFMAN-BST(T)
+```
+
+---
+
+# 4. After Tree is Built → Recursive Encoding
+
+Once we have the Huffman tree root, we recursively traverse to assign codes:
+
+```text
+GENERATE-CODES(node, code):
+    if node is LEAF:
+        PRINT(node.char, code)
+        return
+    if node.left ≠ NIL:
+        GENERATE-CODES(node.left, code + "0")
+    if node.right ≠ NIL:
+        GENERATE-CODES(node.right, code + "1")
+```
+
+---
+
+# 5. Complexity
+
+* Building Huffman tree (heap or BST): `O(n log n)`
+* Generating codes: `O(n)` (visiting all nodes).
+* Total: **`O(n log n)`**
+
+---
+
+✅ This is the **recursive pseudocode for Huffman encoding**, both heap-based and BST-based.
+It mirrors **Optimal Merge Sequence** but also constructs a **binary tree**.
+
+---
